@@ -1,0 +1,37 @@
+MAGSEAL — Interactive Feasibility Lab
+=====================================
+
+OPENING THE INTERFACE
+1. Open MAGSEAL_Interactive_Lab.html directly in Chrome, Safari, or Edge.
+2. The program runs entirely offline; no MATLAB installation or local server is necessary.
+3. Choose a scenario preset or change settings in the left sidebar.
+4. Click "Run simulation" after changing settings.
+5. Use Play/Pause, the time slider, and playback speed to inspect the repair sequence.
+6. The pressure and leakage graphs compare the chosen scenario with an untreated puncture.
+7. "Export CSV" saves the numerical timeline for your own plots or spreadsheet analysis.
+
+WHAT THE INTERFACE USES
+- Based on the MAGSEAL repository's simulate.py and parameters.json,
+  specifically the version with an EXTERIOR self-healing film and MENP carrier
+  delivery on the interior cabin wall.
+- A 6 mm reference puncture, 20 m^3 example cabin, 101.325 kPa initial pressure,
+  one assumed correctly positioned 200-turn coil at 4 mm standoff.
+- Browser-based numerical Biot-Savart circular-coil field; 0.05 s integration step.
+- Isothermal compressible orifice leakage, specified exterior-film recovery,
+  MENP carrier transport, finite polymer supply, pressure-driven extrusion,
+  and prescribed curing kinetics.
+- The default 600-s result closely matches the repository's Python calculation:
+  approximately 0.67 mg/s final leakage and 56.7 g of air lost.
+
+IMPORTANT SCIENTIFIC LIMITATIONS
+- The animated wall and cross-section are schematic representations of calculated
+  states, NOT microscope footage, CAD mechanics, or experimentally proven healing.
+- Exterior film recovery, its attachment strength, polymer viscosity, supply,
+  resin cure behavior, final edge-seal gap and MENP magnetic moment are assumptions.
+- A calculated leakage below 1 mg/s is only an illustrative screening criterion.
+  It does not demonstrate zero leakage or flight qualification.
+- The model does not include actual robotic coil positioning, 3D field errors,
+  detailed crack geometry, CFD, gas-polymer interfaces, radiation, thermal cycling,
+  or fully coupled structural/contact finite-element analysis.
+
+NO FILES WERE CHANGED IN GITHUB.
