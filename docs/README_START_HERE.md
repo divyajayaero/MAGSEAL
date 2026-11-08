@@ -1,63 +1,51 @@
-# MAGSEAL — HOUR 4: MEMBRANE + RETENTION + PRESSURE FEEDBACK
+# MAGSEAL membrane model
 
-## Start in MATLAB (base MATLAB required)
+This earlier study couples pressure loss, detection, guided module motion and an assumed retaining membrane.
 
-1. Extract the ZIP to `MAGSEAL_Hour4` and set MATLAB **Current Folder** to it.
-2. Keep the Hour 3 `.m` files here; the supplied copies are already updated to the 6-mm case.
-3. Type `run_magseal_hour4` in the Command Window.
-4. Type `verify_magseal_hour4` to run six automated physical/mathematical consistency checks.
-5. **Optional** (requires Simulink): type `run_magseal_hour4_simulink` to build `MAGSEAL_Hour4.slx` and compare its pressure simulation with MATLAB.
+## Run
 
-**No need to edit the old `MAGSEAL_Hour2.slx`.** Its original sensor remains separate. `MAGSEAL_Hour4.slx` is newly generated.
+Open the `matlab` folder in MATLAB.
 
-## How it is coupled
+```matlab
+run_magseal_hour4
+verify_magseal_hour4
+```
 
-Puncture at 2 s → air mass loss → cabin pressure → 100-Pa sensor threshold → coil rise → magnetic force and independent 1D travel of 12 modules → all 12 at target → seating delay → membrane geometry + latch capacity → contact-quality assumption → area available for airflow → air mass loss.
+For the optional Simulink comparison, run `run_magseal_hour4_simulink`. It replays MATLAB's contact timeline and calculates pressure feedback.
 
-The MATLAB solver computes every state in one time loop; there is no hard-coded contact time. In the OPTIONAL Simulink model the calculated contact timeline is *replayed* from MATLAB; Simulink closes its own pressure/sensor/area loop but does **not** recalculate 12 tile trajectories inside the Simulink diagram. This is intentionally disclosed so the claim remains accurate.
+## Model
 
-## Numerical starting design
+A puncture causes air loss. A 100 Pa pressure drop activates the coil. Twelve guided modules move toward the opening. Once all arrive, the model checks seating time, cover overlap and retention capacity before reducing the effective leak area.
 
-- **Keep:** 6-mm puncture, 101325 Pa cabin pressure, 20 m³ isothermal cabin, 100 Pa detection threshold, 12 modules each of 3 g, 8–18 mm guided travel, 0.013116 A·m² per module (literature-INFORMED estimate), hypothetical 0.50 T/m at 18 mm; 2 mN static friction.
-- **Add (assumptions):** 12-mm-diameter *continuous* cover with 3-mm radial overlap around a 6-mm hole, required overlap 2 mm, 0.30-s seating delay, 10-N idealized retaining latch, safety factor 3 on static pressure load, and contact quality of 99% (meaning **1% residual OPEN AREA**).
-- **Source for general sealing concept:** NASA JSC `Alternative MMOD Shielding Concepts` (2023), https://ntrs.nasa.gov/api/citations/20230014767/downloads/MMOD_shielding_alternatives_IOC2_6086_v2.pdf . NASA reported ionomer/elastomer shield specimens retaining pressure through small holes, including example 5-mm hole. NASA did **not** demonstrate MAGSEAL magnetic tile movement, our exact membrane, or this 99% contact quality.
-- **Source for general magnetic soft material concept:** MIT 2018 Yoonho Kim thesis https://dspace.mit.edu/entities/publication/0f6e4b3f-ade7-4057-8a6f-390405f815ec . MIT did **not** validate the MAGSEAL field strength.
+| Input | Assumed value |
+|---|---|
+| Hole diameter | 6 mm |
+| Initial cabin pressure | 101,325 Pa |
+| Cabin volume | 20 m³ |
+| Module mass | 3 g each |
+| Magnetic moment | 0.013116 A m² per module |
+| Reference field gradient | 0.50 T/m at 18 mm |
+| Static friction | 2 mN |
+| Cover diameter | 12 mm |
+| Minimum radial overlap | 2 mm |
+| Seating delay | 0.30 s |
+| Latch capacity | 10 N |
+| Pressure-load multiplier | 3 |
+| Nominal residual open area | 1% |
 
-## Equations
+Air loss uses choked orifice flow into vacuum and an isothermal cabin model. Magnetic force is the effective moment multiplied by an assumed distance-dependent field gradient. Retention requires latch capacity to exceed three times the pressure force across the hole.
 
-Choked mass flow to ideal vacuum: `m_dot = Cd * A_eff * P * sqrt(gamma/(R*T)) * (2/(gamma+1))^((gamma+1)/(2*(gamma-1)))`.
+The scenarios compare nominal contact, disabled actuation, weak actuation, insufficient latch capacity and partial contact.
 
-Isothermal cabin: `P_next = P - dt*(R*T/V)*m_dot`.
+## Adjust the study
 
-Magnetic force on each module: `F_i = m_eff_i * G_i(gap_i) * fieldFraction`, with **assumed** gap dependence `G_i = gradientRef * (gapRef/(gapRef+gap_i))^gradientExponent`.
+Edit `magseal_hour4_parameters.m` for latch capacity, contact quality, membrane diameter and seating delay. Edit `magseal_hour3_parameters.m` for magnetic actuation.
 
-Pressure loading on cover: `F_P = (P-Pext)*pi*d_hole^2/4`; retained iff `latchCapacity >= retentionSafetyFactor * F_P`.
+The 99% contact input prescribes a 1% residual opening. Physical contact, seam leakage, adhesion, impact damage and coil field distribution need further modeling and testing. The link between the independent guides and continuous cover is conceptual.
 
-Geometry condition: radial overlap `(membraneDiameter-holeDiameter)/2 >= requiredRadialOverlap`.
+## References
 
-After ALL modules arrive, enough time has elapsed to seat the membrane, and the geometry and retention conditions pass: `A_eff = A_hole*(1-contactQuality)`. Otherwise `A_eff = A_hole` for times after puncture.
+NASA's ionomer/elastomer shielding experiments provide background for self-sealing materials. MAGSEAL's membrane and actuation parameters remain design assumptions.
 
-**99% contact quality is not an empirical seal-efficiency number.** The code does not solve gasket deformation/contact stresses, fluid flow through seams, adhesive behavior, thermal cycling, micrometeoroid damage to the membrane, or electromagnet Maxwell fields. It also does not simulate 2D positions or the actual mechanism that couples 12 independent guides to the continuous cover.
-
-## Five scenarios in `run_magseal_hour4.m`
-
-1. Assumed good contact — all tiles arrive, cover meets geometry, latch passes, 1% area remains.
-2. No magnetic actuation — no tile arrival, 100% area open.
-3. Weak magnetic field — no tile arrival, 100% area open.
-4. Underrated latch (4 N vs ~8.6 N target) — tiles arrive but NO sealing.
-5. Partial contact (60%) — all tiles arrive but 40% residual area leaks.
-
-## Change parameters for live demo
-
-Edit **only** `magseal_hour4_parameters.m` for Hour 4 design inputs:
-
-- `s.latchCapacity = 10.0` → try `4.0` to show retention failure.
-- `s.contactQuality = 0.99` → try `0.60` for partial contact.
-- `s.membraneDiameter = 0.012` → try `0.009` to fail the 2-mm overlap requirement.
-- `s.seatingDelay = 0.30` → try `2.00` to demonstrate slow seating.
-
-Other scripts inherit the same Hour 3 magnetic model unchanged. For magnetic strength changes, edit `magseal_hour3_parameters.m` (`q.fieldScale`).
-
-## Key caution
-
-The plots demonstrate what would happen **IF** the assumed coil forces, 10-N retention, and 99% coverage are met. They do not prove those three hardware conditions can be achieved together. NASA's self-sealing test is an independent proof of a different mechanism, not a MAGSEAL validation.
+- [NASA — Alternative MMOD Shielding Concepts](https://ntrs.nasa.gov/citations/20230014767)
+- [MIT — Magnetic soft-material research](https://dspace.mit.edu/entities/publication/0f6e4b3f-ade7-4057-8a6f-390405f815ec)
