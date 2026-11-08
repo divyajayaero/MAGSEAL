@@ -1,0 +1,20 @@
+{
+  "dt": 0.02, "tEnd": 600, "punctureTime": 2,
+  "P0": 101325, "Vcabin": 20, "Tgas": 293.15, "Rgas": 287.05,
+  "gamma": 1.4, "Cd": 0.75, "sensorDropPa": 100,
+  "holeDiameter": 0.006, "hullThickness": 0.002,
+  "coilRadius": 0.004, "coilStandoff": 0.004, "coilTurns": 200,
+  "coilCurrent": 2, "coilRampTau": 0.25, "maxCoilOnTime": 15,
+  "carrierMoment": 0.001794, "fieldStep": 0.00005,
+  "rStart": 0.008, "staticFriction": 0.002, "kineticFriction": 0.0015,
+  "guideFrictionCoefficient": 0.05, "motionDamping": 0.6, "speedLimit": 0.025,
+  "wireDiameter": 0.00025, "copperResistivity": 1.72e-8,
+  "copperDensity": 8960, "copperSpecificHeat": 385,
+  "thermalResistance": 8, "ambientTemp": 293.15, "coilMaxTemp": 373.15,
+  "exteriorThickness": 0.0005, "healingDelay": 1, "healingTau": 10,
+  "residualAreaFraction": 0.001, "exteriorCapacityN": 10,
+  "safetyFactor": 3, "gelViscosity": 3, "cureTau": 90,
+  "feedRate": 1e-9, "inventory": 1.1e-7, "workingLife": 120,
+  "finalBondShearStrength": 400000, "leakFloorAreaFraction": 0.00001,
+  "leakAcceptance": 0.000001, "polymerDensity": 1000
+}
